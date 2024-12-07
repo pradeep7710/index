@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Special Surprise for Anshika</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(45deg, #ff69b4, #ff1493, #db7093, #c71585);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .love-button {
+            transition: all 0.3s ease;
+            transform: scale(1);
+            margin: 10px;
+        }
+
+        .love-button:hover {
+            transform: scale(1.1);
+        }
+
+        .heart-explosion {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .heart {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23FF69B4"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>') no-repeat;
+            background-size: contain;
+            opacity: 0;
+            animation: heartExplosion 2s ease-out;
+        }
+
+        @keyframes heartExplosion {
+            0% { 
+                opacity: 1; 
+                transform: scale(0) rotate(0deg);
+            }
+            100% { 
+                opacity: 0; 
+                transform: scale(4) rotate(360deg);
+            }
+        }
+
+        .moving-text {
+            position: absolute;
+            white-space: nowrap;
+            color: white;
+            font-weight: bold;
+            opacity: 0.7;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        @keyframes moveText {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100vw); }
+        }
+
+        .no-button {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .crazy-text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            color: white;
+            text-align: center;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <!-- First Page: Initial Invitation -->
+    <div id="firstPage" class="container">
+        <h1 class="text-3xl font-bold mb-6 text-white">A Special Surprise for Anshika 💕</h1>
+        <button onclick="showSurprisePage()" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full love-button">
+            Surprise Me! 🎉
+        </button>
+    </div>
+
+    <!-- Surprise Page: Love Confirmation -->
+    <div id="surprisePage" class="container hidden">
+        <h2 class="text-2xl font-bold mb-6 text-white">Will you be my love? 💘</h2>
+        <div class="flex flex-col items-center">
+            <div class="flex justify-center space-x-4">
+                <button onclick="acceptLove()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full love-button">
+                    Yes, I Will! ❤️
+                </button>
+                <button id="noButton" onclick="handleNoClick()" class="no-button bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-full love-button relative">
+                    No, Thanks 😔
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Final Love Page -->
+    <div id="lovePage" class="container hidden">
+        <h1 class="text-4xl font-bold mb-6 text-white animated-text">
+            Anshika, I Love You! 💖💕
+        </h1>
+        <div class="heart-explosion" id="heartExplosion"></div>
+    </div>
+
+    <!-- Crazy Surprise Page -->
+    <div id="crazySurprisePage" class="hidden">
+        <div class="crazy-text">
+            <h1>YOU CAN'T ESCAPE MY LOVE! 😍</h1>
+            <p>I'll keep pursuing you until you say YES! 💘</p>
+        </div>
+    </div>
+
+    <script>
+        let noClickCount = 0;
+        const maxNoClicks = 5;
+
+        function showSurprisePage() {
+            document.getElementById('firstPage').classList.add('hidden');
+            document.getElementById('surprisePage').classList.remove('hidden');
+            createMovingTexts();
+        }
+
+        function acceptLove() {
+            document.getElementById('surprisePage').classList.add('hidden');
+            document.getElementById('lovePage').classList.remove('hidden');
+            createHeartExplosion();
+        }
+
+        function handleNoClick() {
+            noClickCount++;
+
+            if (noClickCount >= maxNoClicks) {
+                showCrazySurprise();
+                return;
+            }
+
+            // Make the No button move randomly
+            const noButton = document.getElementById('noButton');
+            const containerWidth = window.innerWidth - noButton.offsetWidth;
+            const containerHeight = window.innerHeight - noButton.offsetHeight;
+
+            const randomX = Math.random() * containerWidth;
+            const randomY = Math.random() * containerHeight;
+
+            noButton.style.position = 'fixed';
+            noButton.style.left = `${randomX}px`;
+            noButton.style.top = `${randomY}px`;
+
+            // Show playful messages
+            const messages = [
+                "Are you sure? 🥺",
+                "Not accepting? Think again! 😘",
+                "My love is unstoppable! 💖",
+                "One more chance? 💕",
+                "You can't resist! 😍"
+            ];
+
+            alert(messages[noClickCount - 1] || "Love always finds a way! 💘");
+        }
+
+        function showCrazySurprise() {
+            // Hide all other pages
+            ['firstPage', 'surprisePage', 'lovePage'].forEach(pageId => {
+                document.getElementById(pageId).classList.add('hidden');
+            });
+
+            // Show crazy surprise page
+            document.getElementById('crazySurprisePage').classList.remove('hidden');
+        }
+
+        function createMovingTexts() {
+            const texts = [
+                "I love you!", 
+                "Say yes to love! 💕", 
+                "You're my everything! 💖", 
+                "Our love story begins now! 💘"
+            ];
+
+            for (let i = 0; i < 10; i++) {
+                const text = document.createElement('div');
+                text.classList.add('moving-text');
+                text.textContent = texts[Math.floor(Math.random() * texts.length)];
+                text.style.top = `${Math.random() * 100}%`;
+                text.style.animationDuration = `${Math.random() * 10 + 5}s`;
+                text.style.animationDelay = `${Math.random() * 2}s`;
+                text.style.animation = 'moveText linear infinite';
+                document.body.appendChild(text);
+            }
+        }
+
+        function createHeartExplosion() {
+            const container = document.getElementById('heartExplosion');
+            for (let i = 0; i < 50; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                heart.style.left = `${Math.random() * 100}%`;
+                heart.style.top = `${Math.random() * 100}%`;
+                heart.style.animationDelay = `${Math.random() * 2}s`;
+                container.appendChild(heart);
+            }
+        }
+    </script>
+</body>
+</html>
